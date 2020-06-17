@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="initial-scale=1.0">
+<title>Picker</title>
+<style>
+body {
+    background:#FFF;
+    color:#000;
+    font-family:verdana, sans-serif;
+    font-size:10pt;
+    margin:0;
+    padding:10px;
+}
+
+a:link, a:visited {
+    color:#008;
+    font-weight:bold;
+    text-decoration:none;
+}
+
+a:active, a:hover {
+    color:#ACF;
+}
+
+.info {
+    font-weight:bold;
+}
+
+button {
+    font-family:inherit;
+    cursor:pointer;
+    border:0;
+    border-radius:3px;
+    padding:0.3em 0.5em;
+    background:#CCC;
+    color:#000;
+}
+
+button:hover {
+    background:#DDD;
+}
+
+button.disabled {
+    background:#DDD;
+    color:#888;
+    cursor:not-allowed;
+}
+
+button.disabled:hover {
+    background:#DDD;
+}
+
+#container {
+    position:relative;
+    margin-left:-10px;
+    margin-right:-10px;
+    padding:10px;
+    overflow:hidden;
+}
+
+@media (min-width:1024px) {
+    /* Put the found favorites beside the picking div when the window is sufficiently large */
+    #picking {
+        float:left;
+        width:636px;
+    }
+
+    #secondary {
+        margin-left:646px;
+    }
+}
+
+@media (min-width:1300px) {
+    /* Once we get to the point where 636px is less than half of the width of the screen, make the picking div just take up half */
+    #picking {
+        width:50%;
+    }
+
+    #secondary {
+        margin-left:51%;
+    }
+}
+
+#pick {
+    background:#58F;
+    color:#FFF;
+    font-size:larger;
+    font-weight:bold;
+    width:6em;
+    border-radius:5px;
+    margin-right:10px;
+}
+
+#pick.disabled {
+    background:#ACF;
+}
+
+#pick:hover {
+    background:#ACF;
+}
+
+.item-list {
+    padding:0;
+    list-style-type:none;
+    line-height:100px;
+}
+
+.item-list li {
+    margin:0;
+    display:inline-block;
+    height:100px;
+    width:100px;
+    line-height:100px;
+    border:3px solid transparent;
+    text-align:center;
+    position:relative;
+    vertical-align:top;
+    overflow:hidden;
+    border-radius:100%;
+    background:#F7F7F7;
+    color:#000;
+}
+
+.item-list li img {
+    vertical-align:middle;
+    max-height:100%;
+    max-width:100%;
+}
+
+.item-list li span {
+    display:inline-block;
+    vertical-align:middle;
+    line-height:1.2;
+}
+
+@media (max-width:636px) {
+    .item-list {
+        line-height:75px;
+    }
+
+    .item-list li {
+        line-height:75px;
+        height:75px;
+        width:75px;
+    }
+}
+
+@media (max-width:423px) {
+    .item-list {
+        line-height:50px;
+    }
+
+    .item-list li {
+        line-height:50px;
+        height:50px;
+        width:50px;
+    }
+}
+
+#evaluating li {
+    cursor:pointer;
+}
+
+#favorites li {
+    cursor:move;
+}
+
+.item-list li:hover {
+    background:#CDF;
+}
+
+.item-list.sorting li:hover {
+    background:#F7F7F7;
+}
+
+#evaluating li.selected {
+    border:3px solid #7AC;
+}
+
+#evaluating, #buttons {
+    text-align:center;
+    margin:auto;
+}
+
+#evaluating li.notice {
+    width:auto;
+    height:auto;
+    max-width:260px;
+    margin:auto;
+    background:#F7F7F7;
+    border-radius:10px;
+    padding:30px 30px;
+    color:#000;
+    text-align:center;
+    line-height:1.4;
+    cursor:auto;
+    font-size:10pt;
+}
+
+#buttons {
+    margin-top:30px;
+    position:relative;
+    z-index:3;
+}
+</style>
+</head>
+<body>
+<h1>Drag Race Queen Favourites Picker</h1>
+
+<p>Click to pick your favourite Drag Race Queens!</p>
+
+<p>Include Seasons:
+    <label><input type="checkbox" name="season" class="season" value="One" checked> One</label>
+    <label><input type="checkbox" name="season" class="season" value="Two" checked> Two</label>
+    <label><input type="checkbox" name="season" class="season" value="Three" checked> Three</label>
+    <label><input type="checkbox" name="season" class="season" value="Four" checked> Four</label>
+    <label><input type="checkbox" name="season" class="season" value="Five" checked> Five</label>
+    <label><input type="checkbox" name="season" class="season" value="Six" checked> Six</label>
+    <label><input type="checkbox" name="season" class="season" value="Seven" checked> Seven</label>
+    <label><input type="checkbox" name="season" class="season" value="Eight" checked> Eight</label>
+    <label><input type="checkbox" name="season" class="season" value="Nine" checked> Nine</label>
+    <label><input type="checkbox" name="season" class="season" value="Ten" checked> Ten</label>
+    <label><input type="checkbox" name="season" class="season" value="Eleven" checked> Eleven</label>
+    <label><input type="checkbox" name="season" class="season" value="Twelve" checked> Twelve</label>
+
+    </p>
+    
+
+<div id="container">
+
+<div id="picking">
+<ul id="evaluating" class="item-list">
+</ul>
+
+<p id="buttons"><button id="pick">Pick</button> <button id="pass">Pass</button> <button id="undo">Undo</button> <button id="redo">Redo</button></p>
+</div>
+
+<div id="secondary">
+<h2>Found favorites</h2>
+
+<ol id="favorites" class="item-list">
+</ol>
+</div>
+</div>
+<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+<script src="picker.js"></script>
+<script src="picker-ui.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.7.0/Sortable.min.js"></script>
+<script>
+'use strict';
+
+var items = [
+    {id: 'BeBeZaharaBenet', name: 'BeBe Zahara Benet', image: 'BeBe_Zahara_Benet.jpg', season:'One'},
+    {id: 'NinaFlowers', name: 'Nina Flowers', image: 'Nina_Flowers.jpg', season:'One'},
+    {id: 'RebeccaGlasscock', name: 'Rebecca Glasscock', image: 'Rebecca_Glasscock.jpg', season:'One'},
+    {id: 'Shannel', name: 'Shannel', image: 'Shannel.jpg', season:'One'},
+    {id: 'Ongina', name: 'Ongina', image: 'Ongina.jpg', season:'One'},
+    {id: 'Jade', name: 'Jade', image: 'Jade.jpg', season:'One'},
+    {id: 'Akashia', name: 'Akashia', image: 'Akashia.jpg', season:'One'},
+    {id: 'TammieBrown', name: 'Tammie Brown', image: 'Tammie_Brown.jpg', season:'One'},
+    {id: 'VictoriaPorkchopParker', name: 'Victoria "Porkchop" Parker', image: 'Victoria_Porkchop_Parker.jpg', season:'One'},
+    {id: 'TyraSanchez', name: 'Tyra Sanchez', image: 'Tyra_Sanchez.jpg', season:'Two'},
+    {id: 'Raven', name: 'Raven', image: 'Raven.jpg', season:'Two'},
+    {id: 'Jujubee', name: 'Jujubee', image: 'Jujubee.jpg', season:'Two'},
+    {id: 'Tatianna', name: 'Tatianna', image: 'Tatianna.jpg', season:'Two'},
+    {id: 'PandoraBoxx', name: 'Pandora Boxx', image: 'Pandora_Boxx.jpg', season:'Two'},
+    {id: 'JessicaWild', name: 'Jessica Wild', image: 'Jessica_Wild.jpg', season:'Two'},
+    {id: 'SaharaDavenport', name: 'Sahara Davenport', image: 'Sahara_Davenport.jpg', season:'Two'},
+    {id: 'MorganMcMichaels', name: 'Morgan McMichaels', image: 'Morgan_McMichaels.jpg', season:'Two'},
+    {id: 'Sonique', name: 'Sonique', image: 'Sonique.jpg', season:'Two'},
+    {id: 'MystiqueSummersMadison', name: 'Mystique Summers Madison', image: 'Mystique_Summers_Madison.jpg', season:'Two'},
+    {id: 'NicolePaigeBrooks', name: 'Nicole Paige Brooks', image: 'Nicole_Paige_Brooks.jpg', season:'Two'},
+    {id: 'Shangela', name: 'Shangela', image: 'Shangela.jpg', season:['Two','Three']},
+    {id: 'Raja', name: 'Raja', image: 'Raja.jpg', season:'Three'},
+    {id: 'ManilaLuzon', name: 'Manila Luzon', image: 'Manila_Luzon.jpg', season:'Three'},
+    {id: 'AlexisMateo', name: 'Alexis Mateo', image: 'Alexis_Mateo.jpg', season:'Three'},
+    {id: 'YaraSofia', name: 'Yara Sofia', image: 'Yara_Sofia.jpg', season:'Three'},
+    {id: 'CarmenCarrera', name: 'Carmen Carrera', image: 'Carmen_Carrera.jpg', season:'Three'},
+    {id: 'DeltaWork', name: 'Delta Work', image: 'Delta_Work.jpg', season:'Three'},
+    {id: 'StacyLayneMatthews', name: 'Stacy Layne Matthews', image: 'Stacy_Layne_Matthews.jpg', season:'Three'},
+    {id: 'Mariah', name: 'Mariah', image: 'Mariah.jpg', season:'Three'},
+    {id: 'IndiaFerrah', name: 'India Ferrah', image: 'India_Ferrah.jpg', season:'Three'},
+    {id: 'MimiImfurst', name: 'Mimi Imfurst', image: 'Mimi_Imfurst.jpg', season:'Three'},
+    {id: 'Phoenix', name: 'Phoenix', image: 'Phoenix.jpg', season:'Three'},
+    {id: 'VenusDLite', name: 'Venus DLite', image: 'Venus_DLite.jpg', season:'Three'},
+    {id: 'SharonNeedles', name: 'Sharon Needles', image: 'Sharon_Needles.jpg', season:'Four'},
+    {id: 'ChadMichaels', name: 'Chad Michaels', image: 'Chad_Michaels.jpg', season:'Four'},
+    {id: 'PhiPhiOHara', name: 'Phi Phi OHara', image: 'Phi_Phi_OHara.jpg', season:'Four'},
+    {id: 'LatriceRoyale', name: 'Latrice Royale', image: 'Latrice_Royale.jpg', season:'Four'},
+    {id: 'KenyaMichaels', name: 'Kenya Michaels', image: 'Kenya_Michaels.jpg', season:'Four'},
+    {id: 'DiDaRitz', name: 'DiDa Ritz', image: 'DiDa_Ritz.jpg', season:'Four'},
+    {id: 'Willam', name: 'Willam', image: 'Willam.jpg', season:'Four'},
+    {id: 'JigglyCaliente', name: 'Jiggly Caliente', image: 'Jiggly_Caliente.jpg', season:'Four'},
+    {id: 'Milan', name: 'Milan', image: 'Milan.jpg', season:'Four'},
+    {id: 'MadameLaQueer', name: 'Madame LaQueer', image: 'Madame_LaQueer.jpg', season:'Four'},
+    {id: 'ThePrincess', name: 'The Princess', image: 'The_Princess.jpg', season:'Four'},
+    {id: 'LashauwnBeyond', name: 'Lashauwn Beyond', image: 'Lashauwn_Beyond.jpg', season:'Four'},
+    {id: 'AlisaSummers', name: 'Alisa Summers', image: 'Alisa_Summers.jpg', season:'Four'},
+    {id: 'JinkxMonsoon', name: 'Jinkx Monsoon', image: 'Jinkx_Monsoon.jpg', season:'Five'},
+    {id: 'Alaska', name: 'Alaska', image: 'Alaska.jpg', season:'Five'},
+    {id: 'RoxxxyAndrews', name: 'Roxxxy Andrews', image: 'Roxxxy_Andrews.jpg', season:'Five'},
+    {id: 'Detox', name: 'Detox', image: 'Detox.jpg', season:'Five'},
+    {id: 'CocoMontrese', name: 'Coco Montrese', image: 'Coco_Montrese.jpg', season:'Five'},
+    {id: 'AlyssaEdwards', name: 'Alyssa Edwards', image: 'Alyssa_Edwards.jpg', season:'Five'},
+    {id: 'IvyWinters', name: 'Ivy Winters', image: 'Ivy_Winters.jpeg', season:'Five'},
+    {id: 'JadeJolie', name: 'Jade Jolie', image: 'Jade_Jolie.jpg', season:'Five'},
+    {id: 'LineyshaSparx', name: 'Lineysha Sparx', image: 'Lineysha_Sparx.jpg', season:'Five'},
+    {id: 'ViviennePinay', name: 'Vivienne Pinay', image: 'Vivienne_Pinay.jpg', season:'Five'},
+    {id: 'HoneyMahogany', name: 'Honey Mahogany', image: 'Honey_Mahogany.jpg', season:'Five'},
+    {id: 'MonicaBeverlyHillz', name: 'Monica Beverly Hillz', image: 'Monica_Beverly_Hillz.jpg', season:'Five'},
+    {id: 'SerenaChaCha', name: 'Serena ChaCha', image: 'Serena_ChaCha.jpg', season:'Five'},
+    {id: 'PennyTration', name: 'Penny Tration', image: 'Penny_Traiton.jpg', season:'Five'},
+    {id: 'BiancaDelRio', name: 'Bianca Del Rio', image: 'Bianca_Del_Rio.jpg', season:'Six'},
+    {id: 'AdoreDelano', name: 'Adore Delano', image: 'Adore_Delano.jpg', season:'Six'},
+    {id: 'CourtneyAct', name: 'Courtney Act', image: 'Courtney_Act.jpg', season:'Six'},
+    {id: 'DarienneLake', name: 'Darienne Lake', image: 'Darienne_Lake.jpg', season:'Six'},
+    {id: 'BenDeLaCreme', name: 'BenDeLaCreme', image: 'BenDeLaCreme.jpg', season:'Six'},
+    {id: 'JoslynFox', name: 'Joslyn Fox', image: 'Joslyn_Fox.jpg', season:'Six'},
+    {id: 'TrinityKBonet', name: 'Trinity K. Bonet', image: 'Trinity_K_Bonet.jpg', season:'Six'},
+    {id: 'LaganjaEstranja', name: 'Laganja Estranja', image: 'Laganja_Estranja.jpg', season:'Six'},
+    {id: 'Milk', name: 'Milk', image: 'Milk.jpg', season:'Six'},
+    {id: 'GiaGunn', name: 'Gia Gunn', image: 'Gia_Gunn.jpg', season:'Six'},
+    {id: 'AprilCarrion', name: 'April Carrion', image: 'April_Carrion.jpg', season:'Six'},
+    {id: 'Vivacious', name: 'Vivacious', image: 'Vivacious.jpg', season:'Six'},
+    {id: 'MagnoliaCrawford', name: 'Magnolia Crawford', image: 'Magnolia_Crawford.jpg', season:'Six'},
+    {id: 'KellyMantle', name: 'Kelly Mantle', image: 'Kelly_Mantle.jpg', season:'Six'},
+    {id: 'VioletChachki', name: 'Violet Chachki', image: 'Violet_Chachki.jpg', season:'Seven'},
+    {id: 'GingerMinj', name: 'Ginger Minj', image: 'Ginger_Minj.jpg', season:'Seven'},
+    {id: 'Pearl', name: 'Pearl', image: 'Pearl.jpg', season:'Seven'},
+    {id: 'KennedyDavenport', name: 'Kennedy Davenport', image: 'Kennedy_Davenport.jpg', season:'Seven'},
+    {id: 'Katya', name: 'Katya', image: 'Katya.jpg', season:'Seven'},
+    {id: 'TrixieMattel', name: 'Trixie Mattel', image: 'Trixie_Mattel.jpg', season:'Seven'},
+    {id: 'MissFame', name: 'Miss Fame', image: 'Miss_Fame.jpg', season:'Seven'},
+    {id: 'JaidynnDioreFierce', name: 'Jaidynn Diore Fierce', image: 'Jaidynn_Diore_Fierce.jpg', season:'Seven'},
+    {id: 'Max', name: 'Max', image: 'Max.jpg', season:'Seven'},
+    {id: 'KandyHo', name: 'Kandy Ho', image: 'Kandy_Ho.jpg'},
+    {id: 'MrsKashaDavis', name: 'Mrs. Kasha Davis', image: 'Mrs_Kasha_Davis.jpg', season:'Seven'},
+    {id: 'JasmineMasters', name: 'Jasmine Masters', image: 'Jasmine_Masters.jpg', season:'Seven'},
+    {id: 'SashaBelle', name: 'Sasha Belle', image: 'Sasha_Belle.jpg', season:'Seven'},
+    {id: 'TempestDuJour', name: 'Tempest DuJour', image: 'Tempest_DuJour.jpg', season:'Seven'},
+    {id: 'BobtheDrag', name: 'Bob the Drag Queen', image: 'Bob_The_Drag_Queen.jpg', season:'Eight'},
+    {id: 'KimChi', name: 'Kim Chi', image: 'Kim_Chi.jpg', season:'Eight'},
+    {id: 'NaomiSmalls', name: 'Naomi Smalls', image: 'Naomi_Smalls.jpg', season:'Eight'},
+    {id: 'ChiChiDeVayne', name: 'Chi Chi DeVayne', image: 'Chi_Chi_DeVayne.jpg', season:'Eight'},
+    {id: 'DerrickBarry', name: 'Derrick Barry', image: 'Derrick_Barry.jpg', season:'Eight'},
+    {id: 'ThorgyThor', name: 'Thorgy Thor', image: 'Thorgy_Thor.jpg', season:'Eight'},
+    {id: 'RobbieTurner', name: 'Robbie Turner', image: 'Robbie_Turner.jpg', season:'Eight'},
+    {id: 'AcidBetty', name: 'Acid Betty', image: 'Acid_Betty.jpg', season:'Eight'},
+    {id: 'NayshaLopez', name: 'Naysha Lopez', image: 'Naysha_Lopez.jpg', season:'Eight'},
+    {id: 'DaxExclamationPoint', name: 'Dax ExclamationPoint', image: 'Dax_ExclamationPoint.jpg', season:'Eight'},
+    {id: 'LailaMcQueen', name: 'Laila McQueen', image: 'Laila_McQueen.jpg', season:'Eight'},
+    {id: 'SashaVelour', name: 'Sasha Velour', image: 'Sasha_Velour.jpg', season:'Nine'},
+    {id: 'Peppermint', name: 'Peppermint', image: 'Peppermint.jpg', season:'Nine'},
+    {id: 'SheaCoulee', name: 'Shea Coulee', image: 'Shea_Coulee.jpg', season:'Nine'},
+    {id: 'TrinityTaylor', name: 'Trinity Taylor', image: 'Trinity_Taylor.jpg', season:'Nine'},
+    {id: 'AlexisMichelle', name: 'Alexis Michelle', image: 'Alexis_Michelle.jpg', season:'Nine'},
+    {id: 'NinaBoninaBrown', name: 'Nina Bonina Brown', image: 'Nina_Bonina_Brown.jpg', season:'Nine'},
+    {id: 'Valentina', name: 'Valentina', image: 'Valentina.jpg', season:'Nine'},
+    {id: 'FarrahMoan', name: 'Farrah Moan', image: 'Farrah_Moan.jpg', season:'Nine'},
+    {id: 'Aja', name: 'Aja', image: 'Aja.jpg', season:'Nine'},
+    {id: 'CynthiaLeeFontaine', name: 'Cynthia Lee Fontaine', image: 'Cynthia_Lee_Fontaine.jpg', season:['Nine','Eight']},
+    {id: 'Eureka', name: 'Eureka', image: 'Eureka.jpg', season:['Nine','Ten']},
+    {id: 'CharlieHides', name: 'Charlie Hides', image: 'Charlie_Hides.jpg', season:'Nine'},
+    {id: 'KimoraBlac', name: 'Kimora Blac', image: 'Kimora_Blac.jpg', season:'Nine'},
+    {id: 'JaymesMansfield', name: 'Jaymes Mansfield', image: 'Jaymes_Mansfield.jpg', season:'Nine'},
+    {id: 'Aquaria', name: 'Aquaria', image: 'Aquaria.jpg', season:'Ten'},
+    {id: 'KameronMichaels', name: 'Kameron Michaels', image: 'Kameron_Michaels.jpg', season:'Ten'},
+    {id: 'AsiaOHara', name: 'Asia OHara', image: 'Asia_OHara.jpg', season:'Ten'},
+    {id: 'MizCracker', name: 'Miz Cracker', image: 'Miz_Cracker.jpg', season:'Ten'},
+    {id: 'MonetXChange', name: 'Monet X Change', image: 'Monet_X_Change.jpg', season:'Ten'},
+    {id: 'TheVixen', name: 'The Vixen', image: 'The_Vixen.jpg', season:'Ten'},
+    {id: 'MoniqueHeart', name: 'Monique Heart', image: 'Monique_Heart.jpg', season:'Ten'},
+    {id: 'BlairSt.Clair', name: 'Blair St. Clair', image: 'Blair_St_Clair.jpg', season:'Ten'},
+    {id: 'MayhemMiller', name: 'Mayhem Miller', image: 'Mayhem_Miller.jpg', season:'Ten'},
+    {id: 'DustyRayBottoms', name: 'Dusty Ray Bottoms', image: 'Dusty_Ray_Bottoms.jpg', season:'Ten'},
+    {id: 'YuhuaHamasaki', name: 'Yuhua Hamasaki', image: 'Yuhua_Hamasaki.jpg', season:'Ten'},
+    {id: 'KalorieKarbdashianWilliams', name: 'Kalorie Karbdashian Williams', image: 'Kalorie_Karbdashian_Williams.jpg', season:'Ten'},
+    {id: 'YvieOddly', name: 'Yvie Oddly', image: 'Yvie_Oddly.jpg', season:'Eleven'},
+    {id: 'BrookeLynnHytes', name: 'Brooke Lynn Hytes', image: 'Brooke_Lynn_Hytes.jpg', season:'Eleven'},
+    {id: 'AkeriaCDavenport', name: 'Akeria C. Davenport', image: 'Akeria_C_Davenport.jpg', season:'Eleven'},
+    {id: 'SilkyNutmegGanache', name: 'Silky Nutmeg Ganache', image: 'Silky_Nutmeg_Ganache.jpg', season:'Eleven'},
+    {id: 'VanessaVanjieMateo', name: 'Vanessa Vanjie Mateo', image: 'Vanessa_Vanjie_Mateo.jpg', season:['Eleven','Twelve']},
+    {id: 'NinaWest', name: 'Nina West', image: 'Nina_West.jpg', season:'Eleven'},
+    {id: 'ShugaCain', name: 'Shuga Cain', image: 'Shuga_Cain.jpg', season:'Eleven'},
+    {id: 'PlastiqueTiara', name: 'Plastique Tiara', image: 'Plastique_Tiara.jpg', season:'Eleven'},
+    {id: 'RaJahOHara', name: 'RaJah OHara', image: 'RaJah_OHara.jpg', season:'Eleven'},
+    {id: 'ScarletEnvy', name: 'Scarlet Envy', image: 'Scarlet_Envy.jpg', season:'Eleven'},
+    {id: 'ArielVersace', name: 'Ariel Versace', image: 'Ariel_Versace.jpg', season:'Eleven'},
+    {id: 'MercedesImanDiamond', name: 'Mercedes Iman Diamond', image: 'Mercedes_Iman_Diamond.jpg', season:'Eleven'},
+    {id: 'HoneyDavenport', name: 'Honey Davenport', image: 'Honey_Davenport.jpg', season:'Eleven'},
+    {id: 'KahannaMontrese', name: 'Kahanna Montrese', image: 'Kahanna_Montrese.jpg', season:'Eleven'},
+    {id: 'Soju', name: 'Soju', image: 'Soju.jpg', season:'Eleven'},
+    {id: 'JaidaEssenceHall', name: 'Jaida Essence Hall', image: 'Jadia_Essence_Hall.jpg', season:'Twelve'},
+    {id: 'CrystalMethyd', name: 'Crystal Methyd', image: 'Crystal_Methyd.jpg'},
+    {id: 'GigiGoode', name: 'Gigi Goode', image: 'Gigi_Goode.jpg', season:'Twelve'},
+    {id: 'JackieCox', name: 'Jackie Cox', image: 'Jackie_Cox.jpg', season:'Twelve'},
+    {id: 'HeidiNCloset', name: 'Heidi N Closet', image: 'Heidi_N_Closet.jpg', season:'Twelve'},
+    {id: 'WidowVonDu', name: 'Widow VonDu', image: 'Widow_VonDu.jpg', season:'Twelve'},
+    {id: 'Jan', name: 'Jan', image: 'Jan.jpg', season:'Twelve'},
+    {id: 'Brita', name: 'Brita', image: 'Brita.jpg', season:'Twelve'},
+    {id: 'AidenZhane', name: 'Aiden Zhane', image: 'Aiden_Zhane.jpg', season:'Twelve'},
+    {id: 'NickyDoll', name: 'Nicky Doll', image: 'Nicky_Doll.jpg', season:'Twelve'},
+    {id: 'RockMSakura', name: 'Rock M. Sakura', image: 'Rock_M_Sakura.jpg', season:'Twelve'},
+    {id: 'DahliaSin', name: 'Dahlia Sin', image: 'Dahlia_Sinn.jpg', season:'Twelve'}
+];
+
+var myPicker = new picker.Picker({
+    items: items,
+    defaultSettings: {
+        season: ['One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Eleven','Twelve']
+    },
+    shouldIncludeItem: function(item, settings){
+        return settings.season.indexOf(item.season) !== -1;
+    }
+});
+
+var pickerUI = new PickerUI(myPicker, {
+    elements: {
+        pick: "#pick",
+        pass: "#pass",
+        undo: "#undo",
+        redo: "#redo",
+        evaluating: "#evaluating",
+        favorites: "#favorites",
+        settings: {
+            season: ".season"
+        }
+    }
+});
+
+pickerUI.initialize();
+
+/* Sortable favorites - you can safely remove this, and the Sortable.min.js script, if you don't want to be able to sort your favorite list. */
+var sortable = new Sortable(pickerUI.elem.favorites.get(0), {
+    draggable: '.item',
+    animation: 100,
+    onStart: function() {
+        pickerUI.elem.favorites.addClass("sorting");
+    },
+    onEnd: function() {
+        pickerUI.elem.favorites.removeClass("sorting");
+    },
+    onUpdate: function() {
+        myPicker.setFavorites(pickerUI.elem.favorites.children().map(function() {
+            return pickerUI.getItem(this);
+        }).get());
+        pickerUI.update(true);
+    }
+});
+/* End sortable favorites */
+</script>
+</body>
+</html>
